@@ -2,10 +2,13 @@
 import 'package:flutter/material.dart';
 
 class NameCard extends StatelessWidget {
-  const NameCard({Key? key, required this.data, required this.item})
+   NameCard({Key? key, required this.data, required this.item,})
       : super(key: key);
   final String data;
   final String item;
+  // final TextEditingController textEditingController;
+  
+  final textController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -35,3 +38,30 @@ class NameCard extends StatelessWidget {
     );
   }
 }
+
+
+
+
+class InputCard extends StatelessWidget {
+  const InputCard({
+    Key? key, required this.hintText,required this.controller
+  }) : super(key: key);
+ final String hintText;
+ final TextEditingController controller;
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: TextFormField(
+        controller: controller,
+        textInputAction: TextInputAction.next,
+        decoration:  InputDecoration(
+            hintText: hintText,
+            fillColor: Colors.teal,
+            border:const  OutlineInputBorder()),
+      ),
+    );
+  }
+}
+
+

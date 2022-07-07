@@ -1,8 +1,21 @@
+
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:getx_student_app/controller/provider.dart';
+import 'package:getx_student_app/models/hive_model.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import '../my widgets/widgets.dart';
 
 class AddStudent extends StatelessWidget {
-  const AddStudent({Key? key}) : super(key: key);
+  AddStudent({Key? key, }) : super(key: key);
+  final nameController = TextEditingController();
+  final ageController = TextEditingController();
+  final placeController = TextEditingController();
+  final phoneController = TextEditingController();
 
+  File? imagefile;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,17 +29,38 @@ class AddStudent extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              ClipRRect(
-                child: Image.asset(
-                  'asset/image/man.jpg',
-                  fit: BoxFit.cover,
-                ),
+              const SizedBox(
+                height: 30,
+              ),
+              Consumer<ProviderModel>(
+                
+                builder: (context, value, child)  {
+                  String imageString= value.imageString;
+                  return ClipOval(
+                    child: SizedBox.fromSize(
+                        size:const Size.fromRadius(48), 
+                         child:imageString.isEmpty?
+                             Image.asset(
+                                'asset/image/man.jpg',
+                                width: 20,
+                                height: 20,
+                                fit: BoxFit.cover,
+                              ): Image.memory(base64Decode(imageString))
+                            
+                              ),
+                  );
+                }
+              ),
+              const SizedBox(
+                height: 30,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        _chosePick(ImageSource.camera,context);
+                      },
                       style: ButtonStyle(
                           backgroundColor:
                               MaterialStateProperty.all(Colors.teal)),
@@ -38,7 +72,9 @@ class AddStudent extends StatelessWidget {
                     width: 30,
                   ),
                   TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        _chosePick(ImageSource.gallery,context);
+                      },
                       style: ButtonStyle(
                           backgroundColor:
                               MaterialStateProperty.all(Colors.teal)),
@@ -46,13 +82,28 @@ class AddStudent extends StatelessWidget {
                           style: TextStyle(fontSize: 20, color: Colors.white))),
                 ],
               ),
-             const InputCard(hintText: 'Enter Name',),
-              const InputCard(hintText: 'Age',),
-               const InputCard(hintText: 'place',),
-                const InputCard(hintText: 'Phone',),
-            
+              InputCard(
+                controller: nameController,
+                hintText: 'Enter Name',
+              ),
+              InputCard(
+                
+                controller: ageController,
+                hintText: 'Age',
+              ),
+              InputCard(
+                controller: placeController,
+                hintText: 'place',
+              ),
+              InputCard(
+                controller: phoneController,
+                hintText: 'Phone',
+              ),
               TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    _onButtonClick(context);
+                      Navigator.of(context).pop();
+                  },
                   style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(Colors.teal)),
                   child: const Text(
@@ -65,26 +116,39 @@ class AddStudent extends StatelessWidget {
       ),
     );
   }
-}
 
-class InputCard extends StatelessWidget {
-  const InputCard({
-    Key? key, required this.hintText
-  }) : super(key: key);
- final String hintText;
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(12.0),
-      child: TextFormField(
-        textInputAction: TextInputAction.next,
-        decoration:  InputDecoration(
-            hintText: hintText,
-            fillColor: Colors.teal,
-            border:const  OutlineInputBorder()),
-      ),
-    );
+  void _chosePick(source,BuildContext context) async {
+    final XFile? image = await ImagePicker().pickImage(source: source);
+    if (image != null) {
+     imagefile = File(image.path);
+    ProviderModel controller =  Provider.of<ProviderModel>(context,listen: false);
+    controller.addImage(image);
+      
+    }
   }
+
+  void _onButtonClick( BuildContext context) {
+    ProviderModel controller = Provider.of<ProviderModel>(context,listen: false);
+    final name = nameController.text;
+    final age = ageController.text;
+    final place = placeController.text;
+    final phone = phoneController.text;
+
+    if (name.isEmpty || age.isEmpty || place.isEmpty || phone.isEmpty) {
+      return;
+    }
+
+    final student = StudentModel(
+        name: name,
+        age: age,
+        place: place,
+        phone: phone,
+        imagString: controller.imageString);
+    controller.addStudent(student);
+    
+
+  }
+
+
+  
 }
-
-
