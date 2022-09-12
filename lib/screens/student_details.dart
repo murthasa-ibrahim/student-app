@@ -1,21 +1,17 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:getx_student_app/controller/provider.dart';
 import 'package:getx_student_app/models/hive_model.dart';
 import 'package:getx_student_app/screens/edit_student.dart';
-import 'package:provider/provider.dart';
 
 import '../my widgets/widgets.dart';
 
 class StudentDetails extends StatelessWidget {
-  const StudentDetails({Key? key,required this.details }) : super(key: key);
- final StudentModel details;
+  const StudentDetails({Key? key, required this.details}) : super(key: key);
+  final StudentModel details;
   @override
   Widget build(BuildContext context) {
-    ProviderModel model = Provider.of<ProviderModel>(context,listen: false);
     return Scaffold(
-     
       body: SafeArea(
         child: SizedBox(
           width: double.infinity,
@@ -31,11 +27,17 @@ class StudentDetails extends StatelessWidget {
                   ),
                 ],
               ),
-               CircleAvatar(
-                radius: 100,
-                backgroundImage: MemoryImage(const Base64Decoder().convert(details.imagString)),
-              ),
-               NameCard(
+              details.imagString.isEmpty
+                  ? const CircleAvatar(
+                      radius: 70,
+                      backgroundColor: Colors.black,
+                      backgroundImage: AssetImage('asset/image/userimage.jpg'))
+                  : CircleAvatar(
+                      radius: 70,
+                      backgroundColor: Colors.black,
+                      backgroundImage: MemoryImage(
+                          const Base64Decoder().convert(details.imagString))),
+              NameCard(
                 data: details.name,
                 item: 'name',
               ),
@@ -43,12 +45,18 @@ class StudentDetails extends StatelessWidget {
                 data: details.age,
                 item: 'Age',
               ),
-               NameCard(
+              NameCard(
                 data: details.place,
                 item: 'Place',
               ),
-               NameCard(data: details.phone, item: 'Phone'),
-              IconButton(onPressed: () {Navigator.of(context).push(MaterialPageRoute(builder: (context) => EditStudent(data: details),));}, icon: const Icon(Icons.edit)),
+              NameCard(data: details.phone, item: 'Phone'),
+              IconButton(
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => EditStudent(data: details),
+                    ));
+                  },
+                  icon: const Icon(Icons.edit)),
             ],
           ),
         ),

@@ -1,78 +1,89 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import 'package:getx_student_app/models/hive_model.dart';
+import 'package:getx_student_app/providers/edti_provider.dart';
 import 'package:getx_student_app/screens/hom.dart';
+import 'package:provider/provider.dart';
 import '../my widgets/widgets.dart';
 
-class EditStudent extends StatelessWidget {
-   EditStudent({Key? key,required this.data}) : super(key: key);
-// final StudentController studentController;
-final StudentModel data;
-  final nameController = TextEditingController();
-  final ageController = TextEditingController();
-  final placeController = TextEditingController();
-  final phoneController = TextEditingController();
-  
+class EditStudent extends StatefulWidget {
+  const EditStudent({Key? key, required this.data}) : super(key: key);
+  final StudentModel data;
+
+  @override
+  State<EditStudent> createState() => _EditStudentState();
+}
+
+class _EditStudentState extends State<EditStudent> {
+  @override
+  void initState() {
+    context.read<EditProvider>().onInit(widget.data);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    nameController.text = data.name;
-    ageController.text = data.age;
-    placeController.text = data.place;
-    phoneController.text = data.phone; 
+    final editProvider = context.read<EditProvider>();
     return Scaffold(
-      body:  SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Text(
-                        'Edit Details 🧑',
-                        style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  const CircleAvatar(
-                    radius: 100,
-                  ),
-                  InputCard(hintText: 'Name', controller: nameController),
-                    InputCard(hintText: 'age', controller: ageController),
-                      InputCard(hintText: 'place', controller: placeController),
-                        InputCard(hintText: 'phone', controller: phoneController),
-                  // const NameCard(
-                  //   data:'' ,
-                  //   item: 'name',
-                  // ),
-                  // const NameCard(
-                  //   data: '12',
-                  //   item: 'Age',
-                  // ),
-                  // const NameCard(
-                  //   data: 'calicut',
-                  //   item: 'Place',
-                  // ),
-                  // const NameCard(data: '9061119738', item: 'Phone'),
-                  TextButton(
-                  onPressed: () {
-                   data.name = nameController.text;
-                   data.age = ageController.text;
-                   data.place = placeController.text;
-                   data.phone = phoneController.text;
-                   data.save();
-                       Navigator.of(context).push(MaterialPageRoute(builder: (context) => ScreenHome()));
-                  },
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.teal)),
-                  child: const Text(
-                    'Submit',
-                    style: TextStyle(color: Colors.white),
-                  ))
-                ],
-              ),
+        body: SafeArea(
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            const SizedBox(
+              height: 30,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Text(
+                  'Edit Details 🧑',
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            widget.data.imagString.isEmpty
+                ? const CircleAvatar(
+                    radius: 70,
+                    backgroundColor: Colors.black,
+                    backgroundImage: AssetImage('asset/image/userimage.jpg'))
+                : CircleAvatar(
+                    radius: 70,
+                    backgroundColor: Colors.black,
+                    backgroundImage: MemoryImage(
+                        const Base64Decoder().convert(widget.data.imagString))),
+            InputCard(
+                hintText: widget.data.name,
+                controller: editProvider.nameController),
+            InputCard(
+                hintText: widget.data.age,
+                controller: editProvider.ageController),
+            InputCard(
+                hintText: widget.data.place,
+                controller: editProvider.placeController),
+            InputCard(
+                hintText: widget.data.phone,
+                controller: editProvider.phoneController),
+            TextButton(
+                onPressed: () {
+                  editProvider.edit(widget.data);
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const ScreenHome()));
+                },
+                style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(Colors.teal)),
+                child: const Text(
+                  'Submit',
+                  style: TextStyle(color: Colors.white),
+                ))
+          ],
         ),
-      ));
+      ),
+    ));
   }
 }

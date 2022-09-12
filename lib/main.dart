@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:getx_student_app/controller/provider.dart';
+import 'package:getx_student_app/providers/edti_provider.dart';
+import 'package:getx_student_app/providers/home_provider.dart';
 import 'package:getx_student_app/models/hive_model.dart';
 import 'package:getx_student_app/screens/hom.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
- WidgetsFlutterBinding.ensureInitialized();
- await Hive.initFlutter();
-  // if ( !Hive.isAdapterRegistered(StudentModelAdapter().typeId)){
-  //      Hive.registerAdapter(StudentModelAdapter());
-  //  }
-  if(!Hive.isAdapterRegistered(StudentModelAdapter().typeId)){
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  if (!Hive.isAdapterRegistered(StudentModelAdapter().typeId)) {
     Hive.registerAdapter(StudentModelAdapter());
   }
 
@@ -23,18 +21,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) =>  ProviderModel(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<HomeProvider>(
+          create: (context) => HomeProvider(),
+        ),
+        ChangeNotifierProvider<EditProvider>(
+          create: (context) => EditProvider(),
+        ),
+      ],
       child: MaterialApp(
         title: 'Student app',
-         debugShowCheckedModeBanner: false,
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
-       
           primarySwatch: Colors.teal,
-          
         ),
-        home: ScreenHome(),
-      
+        home: const ScreenHome(),
       ),
     );
   }

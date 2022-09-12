@@ -1,23 +1,17 @@
-
-import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:getx_student_app/controller/provider.dart';
-import 'package:getx_student_app/models/hive_model.dart';
+import 'package:getx_student_app/providers/home_provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../my widgets/widgets.dart';
 
 class AddStudent extends StatelessWidget {
-  AddStudent({Key? key, }) : super(key: key);
-  final nameController = TextEditingController();
-  final ageController = TextEditingController();
-  final placeController = TextEditingController();
-  final phoneController = TextEditingController();
+  const AddStudent({
+    Key? key,
+  }) : super(key: key);
 
-  File? imagefile;
   @override
   Widget build(BuildContext context) {
+    final homeProvider = Provider.of<HomeProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add New Student'),
@@ -32,25 +26,27 @@ class AddStudent extends StatelessWidget {
               const SizedBox(
                 height: 30,
               ),
-              Consumer<ProviderModel>(
-                
-                builder: (context, value, child)  {
-                  String imageString= value.imageString;
-                  return ClipOval(
-                    child: SizedBox.fromSize(
-                        size:const Size.fromRadius(48), 
-                         child:imageString.isEmpty?
-                             Image.asset(
-                                'asset/image/man.jpg',
-                                width: 20,
-                                height: 20,
-                                fit: BoxFit.cover,
-                              ): Image.memory(base64Decode(imageString))
-                            
-                              ),
-                  );
-                }
-              ),
+              Consumer<HomeProvider>(builder: (context, value, child) {
+                // String imageString = value.imageString;
+                return value.imagefile == null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(90),
+                        child: Image.asset(
+                          'asset/image/userimage.jpg',
+                          width: 110,
+                          height: 110,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(90),
+                        child: Image.file(
+                          value.imagefile!,
+                          fit: BoxFit.cover,
+                          height: 150,
+                          width: 150,
+                        ));
+              }),
               const SizedBox(
                 height: 30,
               ),
@@ -59,7 +55,7 @@ class AddStudent extends StatelessWidget {
                 children: [
                   TextButton(
                       onPressed: () {
-                        _chosePick(ImageSource.camera,context);
+                        homeProvider.chosePick(ImageSource.camera, context);
                       },
                       style: ButtonStyle(
                           backgroundColor:
@@ -73,7 +69,7 @@ class AddStudent extends StatelessWidget {
                   ),
                   TextButton(
                       onPressed: () {
-                        _chosePick(ImageSource.gallery,context);
+                        homeProvider.chosePick(ImageSource.gallery, context);
                       },
                       style: ButtonStyle(
                           backgroundColor:
@@ -82,73 +78,69 @@ class AddStudent extends StatelessWidget {
                           style: TextStyle(fontSize: 20, color: Colors.white))),
                 ],
               ),
-              InputCard(
-                controller: nameController,
-                hintText: 'Enter Name',
-              ),
-              InputCard(
-                
-                controller: ageController,
-                hintText: 'Age',
-              ),
-              InputCard(
-                controller: placeController,
-                hintText: 'place',
-              ),
-              InputCard(
-                controller: phoneController,
-                hintText: 'Phone',
+              Form(
+                key: homeProvider.formKey,
+                child: Column(
+                  children: [
+                    InputCard(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'name is required';
+                        }
+                        return null;
+                      },
+                      controller: homeProvider.nameController,
+                      hintText: 'Enter Name',
+                    ),
+                    InputCard(
+                        controller: homeProvider.ageController,
+                        hintText: 'Age',
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'enter age';
+                          }
+                          return null;
+                        }),
+                    InputCard(
+                      controller: homeProvider.placeController,
+                      hintText: 'place',
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'enter place ';
+                        }
+                        return null;
+                      },
+                    ),
+                    InputCard(
+                      controller: homeProvider.phoneController,
+                      hintText: 'Phone',
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'enter place ';
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
+                ),
               ),
               TextButton(
                   onPressed: () {
-                    _onButtonClick(context);
-                      Navigator.of(context).pop();
+                    homeProvider.onButtonClick(context);
                   },
                   style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(Colors.teal)),
                   child: const Text(
                     'Submit',
                     style: TextStyle(color: Colors.white),
-                  ))
+                  )),
+              const SizedBox(
+                height: 20,
+              )
             ],
           ),
         ),
       ),
     );
   }
-
-  void _chosePick(source,BuildContext context) async {
-    final XFile? image = await ImagePicker().pickImage(source: source);
-    if (image != null) {
-     imagefile = File(image.path);
-    ProviderModel controller =  Provider.of<ProviderModel>(context,listen: false);
-    controller.addImage(image);
-      
-    }
-  }
-
-  void _onButtonClick( BuildContext context) {
-    ProviderModel controller = Provider.of<ProviderModel>(context,listen: false);
-    final name = nameController.text;
-    final age = ageController.text;
-    final place = placeController.text;
-    final phone = phoneController.text;
-
-    if (name.isEmpty || age.isEmpty || place.isEmpty || phone.isEmpty) {
-      return;
-    }
-
-    final student = StudentModel(
-        name: name,
-        age: age,
-        place: place,
-        phone: phone,
-        imagString: controller.imageString);
-    controller.addStudent(student);
-    
-
-  }
-
-
-  
 }
