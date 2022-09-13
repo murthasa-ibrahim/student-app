@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:getx_student_app/providers/home_provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import '../my widgets/widgets.dart';
 
 class AddStudent extends StatelessWidget {
-  const AddStudent({Key? key}) : super(key: key);
+  const AddStudent({
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final homeProvider = Provider.of<HomeProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add New Student'),
@@ -16,17 +23,40 @@ class AddStudent extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              ClipRRect(
-                child: Image.asset(
-                  'asset/image/man.jpg',
-                  fit: BoxFit.cover,
-                ),
+              const SizedBox(
+                height: 30,
+              ),
+              Consumer<HomeProvider>(builder: (context, value, child) {
+                // String imageString = value.imageString;
+                return value.imagefile == null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(90),
+                        child: Image.asset(
+                          'asset/image/userimage.jpg',
+                          width: 110,
+                          height: 110,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(90),
+                        child: Image.file(
+                          value.imagefile!,
+                          fit: BoxFit.cover,
+                          height: 150,
+                          width: 150,
+                        ));
+              }),
+              const SizedBox(
+                height: 30,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        homeProvider.chosePick(ImageSource.camera, context);
+                      },
                       style: ButtonStyle(
                           backgroundColor:
                               MaterialStateProperty.all(Colors.teal)),
@@ -38,7 +68,9 @@ class AddStudent extends StatelessWidget {
                     width: 30,
                   ),
                   TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        homeProvider.chosePick(ImageSource.gallery, context);
+                      },
                       style: ButtonStyle(
                           backgroundColor:
                               MaterialStateProperty.all(Colors.teal)),
@@ -46,19 +78,65 @@ class AddStudent extends StatelessWidget {
                           style: TextStyle(fontSize: 20, color: Colors.white))),
                 ],
               ),
-             const InputCard(hintText: 'Enter Name',),
-              const InputCard(hintText: 'Age',),
-               const InputCard(hintText: 'place',),
-                const InputCard(hintText: 'Phone',),
-            
+              Form(
+                key: homeProvider.formKey,
+                child: Column(
+                  children: [
+                    InputCard(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'name is required';
+                        }
+                        return null;
+                      },
+                      controller: homeProvider.nameController,
+                      hintText: 'Enter Name',
+                    ),
+                    InputCard(
+                        controller: homeProvider.ageController,
+                        hintText: 'Age',
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'enter age';
+                          }
+                          return null;
+                        }),
+                    InputCard(
+                      controller: homeProvider.placeController,
+                      hintText: 'place',
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'enter place ';
+                        }
+                        return null;
+                      },
+                    ),
+                    InputCard(
+                      controller: homeProvider.phoneController,
+                      hintText: 'Phone',
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'enter place ';
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
+                ),
+              ),
               TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    homeProvider.onButtonClick(context);
+                  },
                   style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(Colors.teal)),
                   child: const Text(
                     'Submit',
                     style: TextStyle(color: Colors.white),
-                  ))
+                  )),
+              const SizedBox(
+                height: 20,
+              )
             ],
           ),
         ),
@@ -66,25 +144,3 @@ class AddStudent extends StatelessWidget {
     );
   }
 }
-
-class InputCard extends StatelessWidget {
-  const InputCard({
-    Key? key, required this.hintText
-  }) : super(key: key);
- final String hintText;
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(12.0),
-      child: TextFormField(
-        textInputAction: TextInputAction.next,
-        decoration:  InputDecoration(
-            hintText: hintText,
-            fillColor: Colors.teal,
-            border:const  OutlineInputBorder()),
-      ),
-    );
-  }
-}
-
-

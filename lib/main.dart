@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:getx_student_app/providers/edti_provider.dart';
+import 'package:getx_student_app/providers/home_provider.dart';
+import 'package:getx_student_app/models/hive_model.dart';
+import 'package:getx_student_app/providers/search_provider.dart';
 import 'package:getx_student_app/screens/hom.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  if (!Hive.isAdapterRegistered(StudentModelAdapter().typeId)) {
+    Hive.registerAdapter(StudentModelAdapter());
+  }
+
   runApp(const MyApp());
 }
 
@@ -11,16 +22,26 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      title: 'Student app',
-       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-     
-        primarySwatch: Colors.teal,
-        
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<HomeProvider>(
+          create: (context) => HomeProvider(),
+        ),
+        ChangeNotifierProvider<EditProvider>(
+          create: (context) => EditProvider(),
+        ),
+         ChangeNotifierProvider<SearchProvider>(
+          create: (context) => SearchProvider(context),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'Student app',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primarySwatch: Colors.teal,
+        ),
+        home: const ScreenHome(),
       ),
-      home:const ScreenHome(),
-  
     );
   }
 }
