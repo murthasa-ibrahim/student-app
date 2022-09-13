@@ -14,6 +14,8 @@ class HomeProvider extends ChangeNotifier {
   final placeController = TextEditingController();
   final phoneController = TextEditingController();
 
+    final ScrollController firstController = ScrollController();
+
   List<StudentModel> studentList = [];
 
   String imageString = '';
@@ -44,26 +46,20 @@ class HomeProvider extends ChangeNotifier {
 
   // when submit button click
   void onButtonClick(BuildContext context) {
-    if(formKey.currentState!.validate()){
+    if (formKey.currentState!.validate()) {
+      final name = nameController.text;
+      final age = ageController.text;
+      final place = placeController.text;
+      final phone = phoneController.text;
 
-    
-    final name = nameController.text;
-    final age = ageController.text;
-    final place = placeController.text;
-    final phone = phoneController.text;
-
-    // if (name.isEmpty || age.isEmpty || place.isEmpty || phone.isEmpty) {
-    //   return;
-    // }
-
-    final student = StudentModel(
-        name: name,
-        age: age,
-        place: place,
-        phone: phone,
-        imagString: imageString);
-    addStudent(student);
-    Navigator.of(context).pop();
+      final student = StudentModel(
+          name: name,
+          age: age,
+          place: place,
+          phone: phone,
+          imagString: imageString);
+      addStudent(student);
+      Navigator.of(context).pop();
     }
   }
 

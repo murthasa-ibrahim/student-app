@@ -47,6 +47,7 @@ class _EditStudentState extends State<EditStudent> {
             const SizedBox(
               height: 20,
             ),
+            
             widget.data.imagString.isEmpty
                 ? const CircleAvatar(
                     radius: 70,

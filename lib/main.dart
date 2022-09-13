@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:getx_student_app/providers/edti_provider.dart';
 import 'package:getx_student_app/providers/home_provider.dart';
 import 'package:getx_student_app/models/hive_model.dart';
+import 'package:getx_student_app/providers/search_provider.dart';
 import 'package:getx_student_app/screens/hom.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
@@ -28,6 +29,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider<EditProvider>(
           create: (context) => EditProvider(),
+        ),
+         ChangeNotifierProvider<SearchProvider>(
+          create: (context) => SearchProvider(context),
         ),
       ],
       child: MaterialApp(

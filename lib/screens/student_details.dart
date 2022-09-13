@@ -28,15 +28,24 @@ class StudentDetails extends StatelessWidget {
                 ],
               ),
               details.imagString.isEmpty
-                  ? const CircleAvatar(
-                      radius: 70,
-                      backgroundColor: Colors.black,
-                      backgroundImage: AssetImage('asset/image/userimage.jpg'))
-                  : CircleAvatar(
-                      radius: 70,
-                      backgroundColor: Colors.black,
-                      backgroundImage: MemoryImage(
-                          const Base64Decoder().convert(details.imagString))),
+                  ? InteractiveViewer(
+                      minScale: 0.1,
+                      maxScale: 1.6,
+                      child: const CircleAvatar(
+                          radius: 70,
+                          backgroundColor: Colors.black,
+                          backgroundImage:
+                              AssetImage('asset/image/userimage.jpg')),
+                    )
+                  : InteractiveViewer(
+                     minScale: 0.1,
+                      maxScale: 1.6,
+                      child: CircleAvatar(
+                          radius: 70,
+                          backgroundColor: Colors.black,
+                          backgroundImage: MemoryImage(const Base64Decoder()
+                              .convert(details.imagString))),
+                    ),
               NameCard(
                 data: details.name,
                 item: 'name',

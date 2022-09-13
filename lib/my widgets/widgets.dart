@@ -23,7 +23,7 @@ class NameCard extends StatelessWidget {
             decoration: BoxDecoration(
                 color: Colors.teal, borderRadius: BorderRadius.circular(10)),
             child: Center(
-                child: Text(
+                child: SelectableText(
               data,
               style: const TextStyle(
                   fontSize: 25,
